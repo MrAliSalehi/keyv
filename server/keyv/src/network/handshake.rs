@@ -1,19 +1,19 @@
 use crate::configuration::internal::InternalConfig;
-use crate::engine::parser::parse_instruction;
-use crate::instruction::init::Init;
+use keyv_core::instructions::init::Init;
 use crate::network::auth_key::AuthKey;
-use crate::network::read_ext::ReadInstruction;
+use crate::network::read_ext::{ReadBuffer, ReadInstruction};
 use crate::network::write_ext::WriteInstruction;
 use std::net::SocketAddr;
 use std::time::Duration;
 use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream;
 use tokio::time::timeout;
+use keyv_core::deserialize::deserialize;
 
 pub async fn start_handshake(
     mut stream: TcpStream,
     s: SocketAddr,
-    buff: &mut Vec<u8>,
+    buff: &mut ReadBuffer,
     pwd: &str,
     ic: InternalConfig,
 ) -> Option<TcpStream> {
@@ -25,14 +25,16 @@ pub async fn start_handshake(
             return None;
         }
     };
-
-    let Some(init) = parse_instruction::<Init>(instr) else {
+    let Some(init) = deserialize::<Init>(instr) else {
         return None;
     };
 
     if init.master_pwd.eq(pwd) {
         let auth_key = AuthKey::from_ip(&ic, &s);
-        stream.write_instruction(auth_key.into_init_result()).await;
+        stream
+            .write_instruction(auth_key.into_init_result())
+            .await
+            .ok()?;
         Some(stream)
     } else {
         None

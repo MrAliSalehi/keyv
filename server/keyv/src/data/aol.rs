@@ -1,7 +1,4 @@
-use crate::engine::parser;
-use crate::instruction::RawInstruction;
 use crate::prelude::Res;
-use itertools::Itertools;
 use std::path::PathBuf;
 use std::str::FromStr;
 

@@ -13,8 +13,11 @@ name = "memchr"
 harness = false
 
 [dependencies]
+keyv-core = { path = "../keyv-core" }
+
 # Async and concurrency
 tokio = { version = "1.45.1", features = ["rt-multi-thread", "macros", "parking_lot", "net", "fs", "io-util", "sync", "time"] }
+async-trait = "0.1.88"
 io-uring = "0.7.7"
 bus = "2.4.1"
 

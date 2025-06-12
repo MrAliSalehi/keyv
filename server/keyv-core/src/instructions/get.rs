@@ -1,4 +1,4 @@
-use crate::instruction::NetworkObject;
+use crate::network_object::NetworkObject;
 
 pub struct Get;
 

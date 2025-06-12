@@ -1,26 +1,51 @@
-use crate::engine::parser;
-use crate::instruction::RawInstruction;
 use eyre::eyre;
+use keyv_core::raw_instruction::RawInstruction;
 use tokio::io::AsyncReadExt;
 use tokio::net::TcpStream;
 
+#[async_trait::async_trait]
 pub trait ReadInstruction {
     async fn read_instruction<'a>(
         &'a mut self,
-        buffer: &'a mut [u8],
+        buffer: &'a mut ReadBuffer,
     ) -> eyre::Result<Option<RawInstruction<'a>>>;
 }
+
+#[async_trait::async_trait]
 impl ReadInstruction for TcpStream {
     async fn read_instruction<'a>(
-        &mut self,
-        buffer: &'a mut [u8],
+        &'a mut self,
+        buffer: &'a mut ReadBuffer,
     ) -> eyre::Result<Option<RawInstruction<'a>>> {
-        let n = self.read(buffer).await?;
-
+        let n = self.read(buffer.get_mut()).await?;
         if n == 0 {
             return Err(eyre!("read zero"));
         }
+        let b = buffer.read_flush(n);
+        Ok(RawInstruction::try_from(b).ok())
+    }
+}
 
-        Ok(parser::parse_bytes(buffer))
+pub struct ReadBuffer {
+    pub _buffer: Vec<u8>,
+    head: usize,
+}
+
+impl ReadBuffer {
+    pub fn with_size(size: usize) -> Self {
+        Self {
+            _buffer: vec![0u8; size],
+            head: 0,
+        }
+    }
+    pub fn get_mut(&mut self) -> &mut [u8] {
+        self._buffer[self.head..].as_mut()
+    }
+
+    pub fn read_flush(&mut self, n: usize) -> &[u8] {
+        self.head += n;
+        let buffer = &self._buffer[..self.head];
+        self.head = 0;
+        buffer
     }
 }

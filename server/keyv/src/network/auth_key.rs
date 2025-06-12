@@ -1,6 +1,5 @@
 use crate::configuration::internal::InternalConfig;
-use crate::instruction::init::InitResult;
-use crate::instruction::serialize::SerializeInstruction;
+use keyv_core::instructions::init::InitResult;
 use chacha20poly1305::aead::Aead;
 use std::net::SocketAddr;
 

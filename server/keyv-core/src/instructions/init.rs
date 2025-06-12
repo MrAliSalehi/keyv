@@ -1,18 +1,18 @@
-use crate::instruction::NetworkObject;
-use crate::instruction::deserialize::DeserializeInstruction;
-use crate::instruction::serialize::SerializeInstruction;
+use crate::deserialize::{DeserializeBuffer, DeserializeInstruction};
+use crate::network_object::NetworkObject;
+use crate::serialize::SerializeInstruction;
 
 pub struct Init {
-    pub(crate) master_pwd: String,
+    pub master_pwd: String,
 }
 
 impl NetworkObject for Init {
     const ID: [u8; 2] = [161, 161]; //a1a1
 }
 
-impl<'a> DeserializeInstruction<'a> for Init {
-    fn des(buffer: &[u8], cursor: &mut usize) -> Option<Self> {
-        let pwd = <String>::des(buffer, cursor)?;
+impl DeserializeInstruction for Init {
+    fn des(buffer: &mut DeserializeBuffer) -> Option<Self> {
+        let pwd = <String>::des(buffer)?;
         Some(Self { master_pwd: pwd })
     }
 }
