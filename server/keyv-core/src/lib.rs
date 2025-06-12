@@ -1,6 +1,5 @@
-use crate::deserialize::{DeserializeBuffer, deserialize};
+use crate::deserialize::deserialize;
 use crate::instructions::Instruction;
-use crate::instructions::init::Init;
 use crate::read_ext::{ReadBuffer, ReadInstruction};
 use crate::write_ext::WriteInstruction;
 use eyre::OptionExt;
@@ -8,6 +7,7 @@ use tokio::net::TcpStream;
 
 mod _unsafe;
 pub mod deserialize;
+pub mod engine_specifications;
 pub mod instructions;
 pub mod network_object;
 pub mod raw_instruction;
@@ -17,16 +17,16 @@ pub mod write_ext;
 
 #[async_trait::async_trait]
 pub trait NwInvoke {
-    async fn invoke_instruction<'a, T: Instruction<'a>>(
-        &'a mut self,
+    async fn invoke_instruction<'a, 'b, T: Instruction<'a, 'b>>(
+        &'b mut self,
         t: T,
     ) -> eyre::Result<T::Output>;
 }
 
 #[async_trait::async_trait]
 impl NwInvoke for TcpStream {
-    async fn invoke_instruction<'a, T: Instruction<'a>>(
-        &'a mut self,
+    async fn invoke_instruction<'a, 'b, T: Instruction<'a, 'b>>(
+        &'b mut self,
         t: T,
     ) -> eyre::Result<T::Output> {
         self.write_instruction(t).await?;

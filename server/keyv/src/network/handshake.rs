@@ -1,6 +1,6 @@
 use crate::prelude::Res;
 use keyv_core::deserialize::deserialize;
-use keyv_core::instructions::init::{Init, InitResult};
+use keyv_core::instructions::init::{Init, InstrResult};
 use keyv_core::read_ext::{ReadBuffer, ReadInstruction};
 use keyv_core::write_ext::WriteInstruction;
 use std::time::Duration;
@@ -21,7 +21,7 @@ pub async fn start_handshake(stream: &mut TcpStream, buff: &mut ReadBuffer, pwd:
     };
 
     let success = init.master_pwd.eq(pwd);
-    let r = stream.write_instruction(InitResult { success }).await;
+    let r = stream.write_instruction(InstrResult { success }).await;
 
     r.is_ok() && success
 }

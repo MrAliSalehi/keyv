@@ -3,6 +3,8 @@ use crate::network;
 use keyv_core::read_ext::{ReadBuffer, ReadInstruction};
 use std::net::SocketAddr;
 use std::time::Duration;
+use keyv_core::deserialize::deserialize;
+use keyv_core::instructions::set::Set;
 use tokio::io::AsyncReadExt;
 use tokio::net::TcpStream;
 use tracing::{info, trace};
@@ -52,6 +54,8 @@ impl TcpHandler {
             let Some(instr) = instr else { continue };
 
             trace!("received instr: {:?}", instr.instr);
+            let set = deserialize::<Set>(instr);
+            
         }
     }
 }

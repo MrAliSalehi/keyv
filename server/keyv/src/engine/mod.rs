@@ -1,10 +1,10 @@
 use hashbrown::HashMap;
 use std::sync::Arc;
+use keyv_core::engine_specifications::*;
 use tokio::sync::RwLock;
 use tokio::task::JoinHandle;
 
-pub type Key<'a> = &'a [u8];
-pub type Val<'a> = &'a [u8];
+
 
 #[derive(Clone)]
 pub struct Engine<'a> {
