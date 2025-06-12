@@ -12,7 +12,7 @@ impl NetworkObject for Init {
     const ID: [u8; 2] = [161, 161]; //a1a1
 }
 
-impl<'a, 'b> DeserializeInstruction<'a, 'b> for Init {
+impl<'a> DeserializeInstruction<'a> for Init {
     fn des(buffer: &mut DeserializeBuffer) -> Option<Self> {
         let pwd = <String>::des(buffer)?;
         Some(Self { master_pwd: pwd })
@@ -27,6 +27,6 @@ impl<'a> SerializeInstruction<'a> for Init {
     }
 }
 
-impl<'a, 'b> Instruction<'a, 'b> for Init {
+impl<'a> Instruction<'a> for Init {
     type Output = InstrResult;
 }

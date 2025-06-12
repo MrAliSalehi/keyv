@@ -1,6 +1,6 @@
-use crate::prelude::Res;
 use keyv_core::deserialize::deserialize;
-use keyv_core::instructions::init::{Init, InstrResult};
+use keyv_core::instructions::init::Init;
+use keyv_core::instructions::instr_result::InstrResult;
 use keyv_core::read_ext::{ReadBuffer, ReadInstruction};
 use keyv_core::write_ext::WriteInstruction;
 use std::time::Duration;

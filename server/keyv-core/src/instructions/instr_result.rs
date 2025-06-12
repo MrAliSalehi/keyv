@@ -17,7 +17,7 @@ impl<'a> SerializeInstruction<'a> for InstrResult {
     }
 }
 
-impl<'a, 'b> DeserializeInstruction<'a, 'b> for InstrResult {
+impl<'a> DeserializeInstruction<'a> for InstrResult {
     fn des(buffer: &mut DeserializeBuffer) -> Option<Self> {
         buffer.read_n(1).get(0).map(|e| Self { success: *e == 1 })
     }

@@ -7,6 +7,6 @@ pub mod init;
 pub mod instr_result;
 pub mod set;
 
-pub trait Instruction<'a, 'b>: SerializeInstruction<'a> + NetworkObject + Send + Sync {
-    type Output: DeserializeInstruction<'a, 'b> + NetworkObject;
+pub trait Instruction<'a>: SerializeInstruction<'a> + NetworkObject + Send + Sync {
+    type Output: DeserializeInstruction<'a> + NetworkObject;
 }

@@ -8,7 +8,7 @@ use tokio::task::JoinHandle;
 
 #[derive(Clone)]
 pub struct Engine<'a> {
-    data: Arc<RwLock<HashMap<Key<'a>, Val<'a>>>>,
+    data: Arc<RwLock<HashMap<Key, Val<'a>>>>,
 }
 
 impl<'a> Engine<'a> {
@@ -18,12 +18,12 @@ impl<'a> Engine<'a> {
         }
     }
 
-    pub async fn get(&'a self, key: Key<'a>) -> Option<&'a [u8]> {
+    pub async fn get(&'a self, key: Key) -> Option<&'a [u8]> {
         let x = self.data.read().await;
-        x.get(key).map(|e| *e)
+        x.get(&key).map(|e| *e)
     }
 
-    pub async fn set(&self, key: Key<'a>, value: Key<'a>) {
+    pub async fn set(&self, key: Key, value: Val<'a>) {
         let mut lock = self.data.write().await;
         lock.insert(key, value);
         drop(lock)

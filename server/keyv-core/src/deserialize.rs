@@ -1,36 +1,36 @@
 use crate::network_object::NetworkObject;
 use crate::raw_instruction::RawInstruction;
 
-pub fn deserialize<'a, T>(raw: RawInstruction<'a>) -> Option<T>
+pub fn deserialize<'a, T>(raw: RawInstruction) -> Option<T>
 where
-    T: DeserializeInstruction<'a, 'a> + NetworkObject,
+    T: DeserializeInstruction<'a> + NetworkObject,
 {
     if raw.instr.ne(&T::ID) {
         return None;
     }
-    let mut buff = DeserializeBuffer::<'a>::new(raw.data);
+    let mut buff = DeserializeBuffer::new(&raw.data);
     T::des(&mut buff)
 }
 
-pub trait DeserializeInstruction<'a, 'b>: Sized {
-    fn des(buffer: &'b mut DeserializeBuffer<'a>) -> Option<Self>;
+pub trait DeserializeInstruction<'a>: Sized {
+    fn des(buffer: &mut DeserializeBuffer) -> Option<Self>;
 }
 
-impl<'a, 'b> DeserializeInstruction<'a, 'b> for String {
-    fn des(buffer: &'b mut DeserializeBuffer<'a>) -> Option<Self> {
+impl<'a> DeserializeInstruction<'a> for String {
+    fn des(buffer: &mut DeserializeBuffer) -> Option<Self> {
         let len = buffer.read_u32() as usize;
         Some(String::from_utf8_lossy(&buffer.read_n(len)).into())
     }
 }
 
-pub struct DeserializeBuffer<'a> {
-    _buffer: &'a [u8],
+pub struct DeserializeBuffer {
+    _buffer: Vec<u8>,
     cursor: usize,
 }
-impl<'a> DeserializeBuffer<'a> {
-    pub fn new(buffer: &'a [u8]) -> Self {
+impl DeserializeBuffer {
+    pub fn new(buffer: &[u8]) -> Self {
         Self {
-            _buffer: buffer,
+            _buffer: buffer.to_vec(),
             cursor: 0,
         }
     }
