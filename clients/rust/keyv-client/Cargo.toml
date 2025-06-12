@@ -4,3 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+keyv-core = { path = "../../../server/keyv-core" }
+tokio = { version = "1.45.1", features = ["rt-multi-thread", "macros", "net", "io-util", "time"] }
+eyre = "0.6.12"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "fmt", "parking_lot", "time", "local-time"] }

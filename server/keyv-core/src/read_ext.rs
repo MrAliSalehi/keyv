@@ -1,7 +1,7 @@
 use eyre::eyre;
-use keyv_core::raw_instruction::RawInstruction;
 use tokio::io::AsyncReadExt;
 use tokio::net::TcpStream;
+use crate::raw_instruction::RawInstruction;
 
 #[async_trait::async_trait]
 pub trait ReadInstruction {

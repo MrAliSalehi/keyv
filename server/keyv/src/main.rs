@@ -1,15 +1,13 @@
 use crate::configuration::config::Config;
 use crate::data::aol::Aol;
 use crate::engine::Engine;
-use crate::network::read_ext::ReadBuffer;
 use crate::prelude::{Res, init_logger};
-use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
+use std::net::SocketAddrV4;
 use std::str::FromStr;
-use std::sync::Arc;
 use std::time::Duration;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio::time::timeout;
+use tokio::io::AsyncReadExt;
 use tracing::{info, trace, warn};
+use keyv_core::read_ext::ReadBuffer;
 
 mod configuration;
 mod data;
@@ -45,11 +43,10 @@ async fn main() -> Res {
         };
         info!("accepted {addr:?}");
         let pwd = config.connection.master_pwd.clone();
-        let _i = config._internal.clone();
         tokio::spawn(async move {
             let mut buffer = ReadBuffer::with_size(config.connection.max_incoming_bytes);
             let Some(mut stream) =
-                network::handshake::start_handshake(stream, addr, &mut buffer, &pwd, _i).await
+                network::handshake::start_handshake(stream, &mut buffer, &pwd).await
             else {
                 warn!("invalid handshake");
                 return;
