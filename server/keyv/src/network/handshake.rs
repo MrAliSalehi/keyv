@@ -1,3 +1,4 @@
+use crate::prelude::Res;
 use keyv_core::deserialize::deserialize;
 use keyv_core::instructions::init::{Init, InitResult};
 use keyv_core::read_ext::{ReadBuffer, ReadInstruction};
@@ -7,28 +8,20 @@ use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream;
 use tokio::time::timeout;
 
-pub async fn start_handshake(
-    mut stream: TcpStream,
-    buff: &mut ReadBuffer,
-    pwd: &str,
-) -> Option<TcpStream> {
+pub async fn start_handshake(stream: &mut TcpStream, buff: &mut ReadBuffer, pwd: &str) -> bool {
     let instr = match timeout(Duration::from_secs(10), stream.read_instruction(buff)).await {
         Ok(Ok(Some(instr))) => instr,
         _ => {
             _ = stream.shutdown().await;
-            drop(stream);
-            return None;
+            return false;
         }
     };
     let Some(init) = deserialize::<Init>(instr) else {
-        return None;
+        return false;
     };
 
     let success = init.master_pwd.eq(pwd);
-    stream
-        .write_instruction(InitResult { success })
-        .await
-        .ok()?;
+    let r = stream.write_instruction(InitResult { success }).await;
 
-    if success { Some(stream) } else { None }
+    r.is_ok() && success
 }
